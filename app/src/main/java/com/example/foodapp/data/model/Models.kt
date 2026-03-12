@@ -4,21 +4,33 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Modèle de réponse pour l'API des recettes (TheMealDB).
+ * L'API renvoie un objet contenant une liste de "meals".
+ */
 data class RecipeResponse(
     val meals: List<RecipeRemote>?
 )
 
+/**
+ * Modèle de données représentant une Recette dans l'application.
+ * L'annotation @Entity indique que cette classe sera une table dans la base de données Room.
+ */
 @Entity(tableName = "recipes")
 data class Recipe(
-    @PrimaryKey val idMeal: String,
-    val strMeal: String,
-    val strCategory: String?,
-    val strArea: String?,
-    val strInstructions: String?,
-    val strMealThumb: String?,
-    val ingredients: List<Ingredient>? = null
+    @PrimaryKey val idMeal: String, // Identifiant unique de la recette
+    val strMeal: String,            // Nom du plat
+    val strCategory: String?,       // Catégorie (ex: Dessert, Seafood)
+    val strArea: String?,           // Origine géographique (ex: French, Italian)
+    val strInstructions: String?,   // Instructions de préparation
+    val strMealThumb: String?,      // URL de l'image de la recette
+    val ingredients: List<Ingredient>? = null // Liste simplifiée des ingrédients
 )
 
+/**
+ * Modèle de données brut reçu de l'API Retrofit.
+ * L'API TheMealDB renvoie les ingrédients dans des champs séparés (strIngredient1, strMeasure1, etc.).
+ */
 data class RecipeRemote(
     val idMeal: String,
     val strMeal: String,
@@ -26,6 +38,7 @@ data class RecipeRemote(
     val strArea: String?,
     val strInstructions: String?,
     val strMealThumb: String?,
+    // Les ingrédients sont fournis de manière peu pratique par l'API (20 colonnes max)
     val strIngredient1: String?, val strMeasure1: String?,
     val strIngredient2: String?, val strMeasure2: String?,
     val strIngredient3: String?, val strMeasure3: String?,
@@ -48,30 +61,45 @@ data class RecipeRemote(
     val strIngredient20: String?, val strMeasure20: String?
 )
 
+/**
+ * Représente un ingrédient avec sa quantité.
+ */
 data class Ingredient(
-    val name: String,
-    val measure: String
+    val name: String,   // Nom de l'ingrédient (ex: Sucre)
+    val measure: String // Quantité (ex: 200g)
 )
 
+/**
+ * Modèle de réponse pour l'API des catégories.
+ */
 data class CategoryResponse(
     val categories: List<Category>
 )
 
+/**
+ * Représente une catégorie de nourriture (ex: Beef, Chicken, Dessert).
+ */
 data class Category(
     val idCategory: String,
     val strCategory: String,
     val strCategoryThumb: String
 )
 
+/**
+ * Fonction d'extension pour convertir un modèle API (RecipeRemote) en modèle local (Recipe).
+ * Cette fonction regroupe les 20 champs d'ingrédients disparates en une liste propre.
+ */
 fun RecipeRemote.toRecipe(): Recipe {
     val ingredients = mutableListOf<Ingredient>()
     
+    // Fonction utilitaire pour ajouter un ingrédient s'il n'est pas vide
     fun addIfNotEmpty(name: String?, measure: String?) {
         if (!name.isNullOrBlank()) {
             ingredients.add(Ingredient(name, measure ?: ""))
         }
     }
 
+    // On parcourt manuellement les 20 emplacements possibles prévus par l'API
     addIfNotEmpty(strIngredient1, strMeasure1)
     addIfNotEmpty(strIngredient2, strMeasure2)
     addIfNotEmpty(strIngredient3, strMeasure3)
