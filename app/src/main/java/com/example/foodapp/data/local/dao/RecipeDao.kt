@@ -1,11 +1,11 @@
-package com.example.foodapp.data.local
+package com.example.foodapp.data.local.dao
 
 import androidx.room.*
 import com.example.foodapp.data.local.entity.RecipeEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Interface DAO (Data Access Object) pour la table des recettes.
+ * Interface DAO pour la table des recettes.
  */
 @Dao
 interface RecipeDao {
