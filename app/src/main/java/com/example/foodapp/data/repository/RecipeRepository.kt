@@ -1,9 +1,8 @@
 package com.example.foodapp.data.repository
 
-import com.example.foodapp.data.local.RecipeDao
+import com.example.foodapp.data.local.dao.RecipeDao
 import com.example.foodapp.data.local.entity.RecipeEntity
-import com.example.foodapp.data.remote.ApiService
-import com.example.foodapp.data.remote.dto.MealDto
+import com.example.foodapp.data.remote.api.MealApi // Utilisation de MealApi
 import com.example.foodapp.data.remote.dto.toDomain
 import com.example.foodapp.domain.model.Category
 import com.example.foodapp.domain.model.Recipe
@@ -15,7 +14,7 @@ import kotlinx.coroutines.flow.map
  * Le Repository gère la synchronisation entre l'API et la base de données locale.
  */
 class RecipeRepository(
-    private val apiService: ApiService,
+    private val mealApi: MealApi, // Utilisation de MealApi
     private val recipeDao: RecipeDao
 ) {
     val allRecipes: Flow<List<Recipe>> = recipeDao.getAllRecipes().map { entities -> 
@@ -24,7 +23,7 @@ class RecipeRepository(
 
     suspend fun refreshRecipes(query: String = "a") {
         try {
-            val response = apiService.searchRecipes(query)
+            val response = mealApi.searchRecipes(query)
             response.meals?.map { it.toDomain().toEntity() }?.let { entities ->
                 recipeDao.insertRecipes(entities)
             }
@@ -35,7 +34,7 @@ class RecipeRepository(
 
     suspend fun getCategories(): List<Category> {
         return try {
-            apiService.getCategories().categories.map { it.toDomain() }
+            mealApi.getCategories().categories.map { it.toDomain() }
         } catch (e: Exception) {
             emptyList()
         }
@@ -43,7 +42,7 @@ class RecipeRepository(
 
     suspend fun filterByCategory(category: String) {
         try {
-            val response = apiService.filterByCategory(category)
+            val response = mealApi.filterByCategory(category)
             response.meals?.map { 
                 it.toDomain().copy(category = category).toEntity() 
             }?.let { entities ->
@@ -71,7 +70,7 @@ class RecipeRepository(
         if (local?.strInstructions != null) return local.toDomainModel()
 
         return try {
-            val response = apiService.getRecipeById(id)
+            val response = mealApi.getRecipeById(id)
             val remote = response.meals?.firstOrNull()?.toDomain()
             if (remote != null) {
                 recipeDao.insertRecipe(remote.toEntity())

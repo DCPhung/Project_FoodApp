@@ -44,7 +44,10 @@ com.example.foodapp
 
 ## ⚙️ Installation
 
-1. Clonez le dépôt 
+1. Clonez le dépôt :
+   ```bash
+   git clone https://github.com/votre-utilisateur/FoodApp.git
+   ```
 2. Ouvrez le projet dans **Android Studio** (Version Ladybug ou ultérieure recommandée).
 3. Laissez Gradle synchroniser les dépendances.
 4. Lancez l'application sur un émulateur ou un appareil physique (Min SDK 24).
@@ -56,3 +59,4 @@ com.example.foodapp
 - La barre de navigation s'affiche dynamiquement une fois que les données initiales sont chargées pour garantir une expérience utilisateur fluide.
 
 ---
+Développé avec ❤️ par [Votre Nom/Pseudo]
